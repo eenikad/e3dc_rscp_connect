@@ -31,6 +31,7 @@ class PowerSensor(E3dcConnectEntity, SensorEntity):
         self._attr_unique_id = f"e3dc_rscp_connect_power_{sensor_id}"
         self._attr_native_unit_of_measurement = UnitOfPower.WATT
         self._attr_device_class = SensorDeviceClass.POWER
+        self._attr_state_class = SensorStateClass.MEASUREMENT
         self.__data_getter = data_getter
         self._sensor_value_id = sensor_value_id
 
