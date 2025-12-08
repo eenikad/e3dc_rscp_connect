@@ -1,6 +1,10 @@
 """Implements the power sensor entity."""
 
-from homeassistant.components.sensor import SensorDeviceClass, SensorEntity
+from homeassistant.components.sensor import (
+    SensorDeviceClass,
+    SensorEntity,
+    SensorStateClass,
+)
 from homeassistant.const import UnitOfPower
 
 from ..coordinator import E3dcRscpCoordinator  # noqa: TID252
