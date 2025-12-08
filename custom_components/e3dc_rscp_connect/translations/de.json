@@ -1,0 +1,72 @@
+{
+    "config": {
+    "step": {
+      "user": {
+        "title": "RSCP Konfiguration",
+        "description": "Zugangsdaten sind deine Portalzugangsdaten\n oder die für den lokalen Benutzer.",
+        "data": {
+          "host": "IP Adresse",
+          "port": "Port",
+          "username": "Benutzername",
+          "password": "Passwort",
+          "key": "RSCP Verschlüsselungsschlüssel"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Verbindung fehlgeschlagen",
+      "invalid_auth": "Ungültige Benutzerdaten"
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "RSCP Konfiguration",
+        "description": "Zugangsdaten sind deine Portalzugangsdaten\n oder die für den lokalen Benutzer",
+        "data": {
+          "host": "IP Adresse",
+          "port": "Port",
+          "username": "Benutzername",
+          "password": "Passwort",
+          "key": "RSCP Verschlüsselungsschlüssel"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Verbindung fehlgeschlagen",
+      "invalid_auth": "Ungültige Benutzerdaten"
+    }
+  },
+  "entity": {
+    "sensor": {
+      "wallbox_status": {
+        "name": "Wallbox Status",
+        "state": {
+          "cable_disconnected": "Kein Fahrzeug verbunden",
+          "cable_connected": "Fahrzeug angeschlossen",
+          "charging": "Lädt",
+          "error": "Fehler"
+        }
+      },
+      "sgready_status": {
+        "name": "SG Ready Status",
+        "state": {
+          "block": "Sperren",
+          "normal": "Normal",
+          "go": "Heizen",
+          "force_go": "Forciert Heizen"
+        }
+      },
+      "ep_status": {
+        "name": "Emergency Power Status",
+        "state": {
+          "not_possible": "Nicht möglich",
+          "active": "Aktiv",
+          "not_active": "Nicht aktiv",
+          "not_available": "Nicht verfügbar",
+          "island_state": "Schalter in OffGrid Position"
+        }
+      }
+    }
+  }
+}

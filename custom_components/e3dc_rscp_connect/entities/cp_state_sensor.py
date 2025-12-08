@@ -1,6 +1,7 @@
 """Implements the charging state sensor for a wallbox."""
 
 from homeassistant.components.sensor import SensorEntity
+from homeassistant.components.sensor.const import SensorDeviceClass
 
 from ..coordinator import E3dcRscpCoordinator  # noqa: TID252
 from ..model.WallboxDataModel import WallboxDataModel  # noqa: TID252
@@ -27,6 +28,15 @@ class CpStateSensor(E3dcConnectEntity, SensorEntity):
             f"{wallbox.device_name.lower().replace(' ', '_')}_charge_state"
         )
 
+        self._attr_device_class = SensorDeviceClass.ENUM
+        self._attr_translation_key = "wallbox_status"
+        self._attr_options = [
+            "cable_disconnected",
+            "cable_connected",
+            "charging",
+            "error",
+        ]
+
     @property
     def native_value(self):
         "Get the data."
@@ -34,14 +44,14 @@ class CpStateSensor(E3dcConnectEntity, SensorEntity):
             f"wallbox_{self._sub_device_index}"
         )
         if not wallbox:
-            return "Unknown"
+            return None
         cp_state = wallbox.cp_state
 
         states = {
-            "A": "Cable disconnected",
-            "B": "Cable connected",
-            "C": "Charging",
-            "F": "Error",
+            "A": "cable_disconnected",
+            "B": "cable_connected",
+            "C": "charging",
+            "F": "error",
         }
 
-        return states.get(cp_state, "Unknown")
+        return states.get(cp_state, None)

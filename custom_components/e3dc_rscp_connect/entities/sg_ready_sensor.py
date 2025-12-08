@@ -1,6 +1,7 @@
 """Implements the charging state sensor for a wallbox."""
 
 from homeassistant.components.sensor import SensorEntity
+from homeassistant.components.sensor.const import SensorDeviceClass
 
 from ..coordinator import E3dcRscpCoordinator  # noqa: TID252
 from .entity import E3dcConnectEntity
@@ -18,16 +19,25 @@ class SGReadySensor(E3dcConnectEntity, SensorEntity):
         self._attr_name = "SG Ready Status"
         self._attr_unique_id = "sg_ready_state"
 
+        self._attr_device_class = SensorDeviceClass.ENUM
+        self._attr_translation_key = "sgready_status"
+        self._attr_options = [
+            "block",
+            "normal",
+            "go",
+            "force_go",
+        ]
+
     @property
     def native_value(self):
         "Get the data."
         sgr_state = self.coordinator.data.get("sg_ready_state")
 
         states = {
-            1: "Block",
-            2: "Normal",
-            3: "Go",
-            4: "Force Go",
+            1: "block",
+            2: "normal",
+            3: "go",
+            4: "force_go",
         }
 
         return states.get(sgr_state, "Unknown")

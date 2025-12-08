@@ -1,6 +1,7 @@
 """Implements the charging state sensor for a wallbox."""
 
 from homeassistant.components.sensor import SensorEntity
+from homeassistant.components.sensor.const import SensorDeviceClass
 
 from ..coordinator import E3dcRscpCoordinator  # noqa: TID252
 from ..model.StorageDataModel import StorageDataModel  # noqa: TID252
@@ -18,6 +19,16 @@ class EmergencyPowerSensor(E3dcConnectEntity, SensorEntity):
         self._attr_name = "Emergency Power Status"
         self._attr_unique_id = "e3dc_rscp_connect_emergency_power_state"
 
+        self._attr_device_class = SensorDeviceClass.ENUM
+        self._attr_translation_key = "ep_status"
+        self._attr_options = [
+            "not_possible",
+            "active",
+            "not_active",
+            "not_available",
+            "island_state",
+        ]
+
     @property
     def native_value(self):
         "Get the data."
@@ -28,11 +39,11 @@ class EmergencyPowerSensor(E3dcConnectEntity, SensorEntity):
         ep_state = storage.emergency_power_state
 
         states = {
-            0: "not possible",
+            0: "not_possible",
             1: "active",
-            2: "not active",
-            3: "not available",
-            4: "switch in island state",
+            2: "not_active",
+            3: "not_available",
+            4: "island_state",
         }
 
         return states.get(ep_state, "Unknown")

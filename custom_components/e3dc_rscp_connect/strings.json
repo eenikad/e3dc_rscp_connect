@@ -1,0 +1,72 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "E3DC Configuration",
+        "description": "Enter your E3DC credentials",
+        "data": {
+          "host": "IP Address",
+          "port": "Port",
+          "username": "Username",
+          "password": "Password",
+          "key": "RSCP Encryption key"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Failed to connect",
+      "invalid_auth": "Invalid authentication"
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "E3DC Configuration",
+        "description": "Please enter your E3DC credentials",
+        "data": {
+          "host": "IP Address",
+          "port": "Port",
+          "username": "Username",
+          "password": "Password",
+          "key": "RSCP Encryption key"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Failed to connect",
+      "invalid_auth": "Invalid authentication"
+    }
+  },
+  "entity": {
+    "sensor": {
+      "wallbox_status": {
+        "name": "Wallbox Status",
+        "state": {
+          "cable_disconnected": "Cable disconnected",
+          "cable_connected": "Cable connected",
+          "charging": "Charging",
+          "error": "Error"
+        }
+      },
+      "sgready_status": {
+        "name": "SG Ready Status",
+        "state": {
+          "block": "Block",
+          "normal": "Normal",
+          "go": "Go",
+          "force_go": "Force Go"
+        }
+      },
+      "ep_status": {
+        "name": "Emergency Power Status",
+        "state": {
+          "not_possible": "Not possible",
+          "active": "Active",
+          "not_active": "Not active",
+          "not_available": "Not available",
+          "island_state": "Switch in island state"
+        }
+      }
+    }
+  }
+}
