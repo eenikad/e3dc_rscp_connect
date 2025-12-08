@@ -132,18 +132,19 @@ class RscpClient:
             received_values = await self.send_and_receive(requests)
 
             for value in received_values:
+                handled = False
                 if self.__storage.handle_rscp_data(value):
                     continue
 
-                elif value.getTagName() == "TAG_WB_DATA":
-                    for wallbox in self.__wallboxes:
-                        wallbox.handle_rscp_data(
-                            value
-                        )  # should check if data has been handled!
-                elif value.getTagName() == "TAG_SGR_DATA":
-                    result_values.update(self.__extract_sgready_data(value))
+                for wallbox in self.__wallboxes:
+                    handled = wallbox.handle_rscp_data(value)
+                    if handled:
+                        break
                 else:
-                    _LOGGER.warning("Received unknown tag: %s", value.getTagName())
+                    if value.getTagName() == "TAG_SGR_DATA":
+                        result_values.update(self.__extract_sgready_data(value))
+                    else:
+                        _LOGGER.warning("Received unknown tag: %s", value.getTagName())
 
         except Exception as err:
             # TODO make Exception more specific

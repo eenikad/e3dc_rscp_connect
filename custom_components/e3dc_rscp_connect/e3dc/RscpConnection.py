@@ -39,20 +39,30 @@ class RscpConnection:
 
         log.debug(f"connecting to device: {self.__host} on port {self.__port}")
         client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        client_socket.setblocking(False)
+
+        loop = asyncio.get_running_loop()
+
         try:
-            loop = asyncio.get_running_loop()
-            client_socket.setblocking(False)
-            # client_socket.settimeout(5)
-            await loop.sock_connect(client_socket, (self.__host, self.__port))
-            self.__clientsock = client_socket
-            log.info("Connection established")
-
-            if self.__ciphersuite:
-                self.__ciphersuite.reset()
-
-        except socket.error as e:
+            await asyncio.wait_for(
+                loop.sock_connect(client_socket, (self.__host, self.__port)), timeout=5
+            )
+        except TimeoutError as e:
+            log.info("Connection timed out")
+            client_socket.close()
+            raise RscpConnectionException(str(e)) from e
+        except OSError as e:
             log.info(f"Error while connecting to device {self.__host}: {str(e)}")
-            raise RscpConnectionException(str(e))
+            client_socket.close()
+            raise RscpConnectionException(str(e)) from e
+
+        self.__clientsock = client_socket
+        log.info("Connection established")
+
+        if self.__ciphersuite:
+            self.__ciphersuite.reset()
+
+        return True
 
     def is_connected(self):
         if self.__clientsock is not None:

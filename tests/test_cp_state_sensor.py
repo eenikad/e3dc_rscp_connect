@@ -43,10 +43,10 @@ def test_cp_state_sensor_attributes(mock_entry) -> None:
 def test_cp_state_sensor_known_states(mock_entry) -> None:
     """Test cp_state mapping to known states."""
     states = {
-        "A": "Cable disconnected",
-        "B": "Cable connected",
-        "C": "Charging",
-        "F": "Error",
+        "A": "cable_disconnected",
+        "B": "cable_connected",
+        "C": "charging",
+        "F": "error",
     }
 
     data_key = "wallbox_1"
@@ -80,7 +80,7 @@ def test_cp_state_sensor_unknown_state(mock_entry) -> None:
         wallbox=wallbox_ident,
     )
 
-    assert sensor.native_value == "Unknown"
+    assert sensor.native_value == None
 
 
 def test_cp_state_sensor_missing_value(mock_entry) -> None:
@@ -95,4 +95,4 @@ def test_cp_state_sensor_missing_value(mock_entry) -> None:
         wallbox=wallbox_ident,
     )
 
-    assert sensor.native_value == "Unknown"
+    assert sensor.native_value == None

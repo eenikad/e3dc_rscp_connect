@@ -50,22 +50,22 @@ class TestSGReadySensor:
     def test_native_value_block_state(self, sg_ready_sensor, mock_coordinator):
         """Test native_value returns 'Block' for state 1."""
         mock_coordinator.data = {"sg_ready_state": 1}
-        assert sg_ready_sensor.native_value == "Block"
+        assert sg_ready_sensor.native_value == "block"
 
     def test_native_value_normal_state(self, sg_ready_sensor, mock_coordinator):
         """Test native_value returns 'Normal' for state 2."""
         mock_coordinator.data = {"sg_ready_state": 2}
-        assert sg_ready_sensor.native_value == "Normal"
+        assert sg_ready_sensor.native_value == "normal"
 
     def test_native_value_go_state(self, sg_ready_sensor, mock_coordinator):
         """Test native_value returns 'Go' for state 3."""
         mock_coordinator.data = {"sg_ready_state": 3}
-        assert sg_ready_sensor.native_value == "Go"
+        assert sg_ready_sensor.native_value == "go"
 
     def test_native_value_force_go_state(self, sg_ready_sensor, mock_coordinator):
         """Test native_value returns 'Force Go' for state 4."""
         mock_coordinator.data = {"sg_ready_state": 4}
-        assert sg_ready_sensor.native_value == "Force Go"
+        assert sg_ready_sensor.native_value == "force_go"
 
     def test_native_value_unknown_state(self, sg_ready_sensor, mock_coordinator):
         """Test native_value returns 'Unknown' for invalid state."""
