@@ -8,6 +8,9 @@ from .e3dc.RscpFrame import RscpFrame
 from .e3dc.RscpValue import RscpValue
 from .model.StorageRscpModel import StorageRscpModel
 from .model.WallboxRscpModel import WallboxRscpModel
+from .model.SgReadyRscpModel import SgReadyRscpModel
+
+from .model.RscpHandlerPipeline import RscpHandlerPipeline
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -23,7 +26,9 @@ class RscpClient:
             host, port, RscpEncryption(rscp_key), username, password
         )
         self.__storage = None
+        self.__sg_ready = None
         self.__wallboxes = []
+        self.__handlerPipeline = RscpHandlerPipeline()
 
     @property
     def wallboxes(self):
@@ -34,6 +39,13 @@ class RscpClient:
     def storage(self):
         "Get access to storage data."
         return self.__storage.get_model()
+
+    @property
+    def sg_ready(self):
+        "Get access to the sg ready data."
+        if self.__sg_ready is None:
+            return None
+        return self.__sg_ready.get_model()
 
     async def _connect_and_login(self) -> None:
         if not self.client.is_connected():
@@ -56,6 +68,7 @@ class RscpClient:
             requests = []
             requests.extend(StorageRscpModel.get_identification_tags())
             requests.extend(WallboxRscpModel.get_identification_tags())
+            requests.extend(SgReadyRscpModel.get_identification_tags())
 
             received_values = await self.send_and_receive(requests)
             for x in received_values:
@@ -66,11 +79,18 @@ class RscpClient:
                 storage = StorageRscpModel.identify(value)
                 if storage is not None:
                     self.__storage = storage
+                    self.__handlerPipeline.add_handler(storage)
 
                 wallbox = WallboxRscpModel.identify(value)
                 if wallbox is not None:
                     self.__wallboxes.append(wallbox)
+                    self.__handlerPipeline.add_handler(wallbox)
                     continue
+
+                sg_ready = SgReadyRscpModel.identify(value)
+                if sg_ready is not None:
+                    self.__sg_ready = sg_ready
+                    self.__handlerPipeline.add_handler(sg_ready)
 
         except ConnectionError as err:
             raise Exception(f"Error: {err}") from err
@@ -131,20 +151,7 @@ class RscpClient:
             # transfer data and wait for response
             received_values = await self.send_and_receive(requests)
 
-            for value in received_values:
-                handled = False
-                if self.__storage.handle_rscp_data(value):
-                    continue
-
-                for wallbox in self.__wallboxes:
-                    handled = wallbox.handle_rscp_data(value)
-                    if handled:
-                        break
-                else:
-                    if value.getTagName() == "TAG_SGR_DATA":
-                        result_values.update(self.__extract_sgready_data(value))
-                    else:
-                        _LOGGER.warning("Received unknown tag: %s", value.getTagName())
+            await self.__handlerPipeline.process(received_values)
 
         except Exception as err:
             # TODO make Exception more specific

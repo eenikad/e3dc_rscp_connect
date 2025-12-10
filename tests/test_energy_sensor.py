@@ -1,7 +1,17 @@
+from pathlib import Path
+import sys
+
+# Add custom_components to path
+custom_components_path = (
+    Path(__file__).parent.parent.parent.parent / "config" / "custom_components"
+)
+sys.path.insert(0, str(custom_components_path))
+
+
 from unittest.mock import Mock
 import pytest
 from datetime import datetime, timedelta, UTC
-from config.custom_components.e3dc_rscp_connect.entities import EnergySensor
+from e3dc_rscp_connect.entities import EnergySensor
 
 
 class MockCoordinator:

@@ -46,4 +46,4 @@ class EmergencyPowerSensor(E3dcConnectEntity, SensorEntity):
             4: "island_state",
         }
 
-        return states.get(ep_state, "Unknown")
+        return states.get(ep_state)

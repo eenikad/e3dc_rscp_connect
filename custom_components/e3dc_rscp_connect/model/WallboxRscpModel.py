@@ -51,7 +51,7 @@ class WallboxRscpModel(RscpModelInterface):
         ]
 
     @staticmethod
-    def identify(container: RscpValue) -> bool:
+    def identify(container: RscpValue) -> RscpModelInterface | None:
         """Tries to identify the wallbox. Input should be a container of type: TAG_WB_DATA."""
         if container.getTagName() != "TAG_WB_DATA":
             return None

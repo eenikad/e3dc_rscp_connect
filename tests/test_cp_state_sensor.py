@@ -1,7 +1,16 @@
 "This file defines tests for CpStateSensor."
 
-from config.custom_components.e3dc_rscp_connect.entities import CpStateSensor
-from config.custom_components.e3dc_rscp_connect.model.WallboxDataModel import (
+from pathlib import Path
+import sys
+
+# Add custom_components to path
+custom_components_path = (
+    Path(__file__).parent.parent.parent.parent / "config" / "custom_components"
+)
+sys.path.insert(0, str(custom_components_path))
+
+from e3dc_rscp_connect.entities import CpStateSensor
+from e3dc_rscp_connect.model.WallboxDataModel import (
     WallboxDataModel,
 )
 import pytest

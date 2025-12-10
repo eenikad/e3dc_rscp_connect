@@ -31,7 +31,12 @@ class SGReadySensor(E3dcConnectEntity, SensorEntity):
     @property
     def native_value(self):
         "Get the data."
-        sgr_state = self.coordinator.data.get("sg_ready_state")
+        sgr = self.coordinator.sg_ready
+
+        if sgr is None:
+            return None
+
+        sgr_state = sgr.state
 
         states = {
             1: "block",
@@ -40,4 +45,4 @@ class SGReadySensor(E3dcConnectEntity, SensorEntity):
             4: "force_go",
         }
 
-        return states.get(sgr_state, "Unknown")
+        return states.get(sgr_state)  # returns None if not found!

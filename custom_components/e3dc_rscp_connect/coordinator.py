@@ -9,6 +9,8 @@ from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, Upda
 from .client import RscpClient
 from .model.WallboxDataModel import WallboxDataModel
 from .model.StorageDataModel import StorageDataModel
+from .model.SgReadyDataModel import SgReadyDataModel
+
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -74,6 +76,11 @@ class E3dcRscpCoordinator(DataUpdateCoordinator):
     def storage(self) -> StorageDataModel:
         "Get access to the storage data."
         return self.client.storage
+
+    @property
+    def sg_ready(self) -> SgReadyDataModel:
+        "Get access to the sg ready data."
+        return self.client.sg_ready
 
     def get_wallbox(self, index: int) -> WallboxDataModel:
         "Returns the ident data of a give wallbox."
