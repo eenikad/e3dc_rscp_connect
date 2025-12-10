@@ -141,13 +141,7 @@ class RscpClient:
                 _LOGGER.info("Not connected, try to reconnect!")
                 await self._connect_and_login()
 
-            requests = []
-
-            requests.extend(self.__storage.get_rscp_tags())
-            self.__create_rscp_tags_for_sgready(requests)
-
-            for wallbox in self.__wallboxes:
-                requests.extend(wallbox.get_rscp_tags())
+            requests = await self.__handlerPipeline.collect_tags()
             # transfer data and wait for response
             received_values = await self.send_and_receive(requests)
 
@@ -162,33 +156,3 @@ class RscpClient:
             result_values[f"wallbox_{wallbox.index}"] = wallbox.get_model()
 
         return result_values
-
-    def __create_rscp_tags_for_sgready(self, requests):
-        requests.append(
-            RscpValue.construct_rscp_value(
-                "TAG_SGR_REQ_DATA",
-                [("TAG_SGR_INDEX", 0xFF), ("TAG_SGR_REQ_STATE", None)],
-            )
-        )
-
-    def __extract_sgready_data(self, container: RscpValue):
-        extracted_values = {}
-
-        sgr_index = container.get_child("TAG_SGR_INDEX")
-        # we need the overall SG Ready state and this is coded inside
-        # index = 0xff:
-        if sgr_index.getValue() == 0xFF:
-            state = container.get_child("TAG_SGR_STATE")
-            extracted_values["sg_ready_state"] = (
-                state.getValue() if state is not None else None
-            )
-
-        return extracted_values
-
-    def __create_rscp_tags_for_sgready(self, requests):
-        requests.append(
-            RscpValue.construct_rscp_value(
-                "TAG_SGR_REQ_DATA",
-                [("TAG_SGR_INDEX", 0xFF), ("TAG_SGR_REQ_STATE", None)],
-            )
-        )

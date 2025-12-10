@@ -1,7 +1,8 @@
 "This file contains the RscpHandlerPipeline."
 
-import logging
+import logging  # noqa: I001
 from .RscpModelInterface import RscpModelInterface
+from ..e3dc.RscpValue import RscpValue  # noqa: TID252
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -25,3 +26,13 @@ class RscpHandlerPipeline:
 
             if not handled:
                 _LOGGER.warning("Unhandled RSCP tag: %s", value.getTagName())
+
+    async def collect_tags(self) -> list[RscpValue]:
+        """Collect rscp tags from all registered handlers."""
+
+        all_tags = []
+        for handler in self._handlers:
+            tags = handler.get_rscp_tags()
+            all_tags.extend(tags)
+
+        return all_tags
