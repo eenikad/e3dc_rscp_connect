@@ -32,9 +32,9 @@ class EmergencyPowerSensor(E3dcConnectEntity, SensorEntity):
     @property
     def native_value(self):
         "Get the data."
-        storage: StorageDataModel = self.coordinator.data.get("storage")
+        storage: StorageDataModel = self.coordinator.storage
         if storage is None:
-            return "Unknown"
+            return None
 
         ep_state = storage.emergency_power_state
 

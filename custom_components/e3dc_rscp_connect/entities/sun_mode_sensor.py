@@ -34,15 +34,16 @@ class SunModeSensor(SelectEntity, E3dcConnectEntity):
     def current_option(self) -> str:
         """Get the current selected option."""
 
-        wallbox: WallboxDataModel = self.coordinator.data.get(
-            f"wallbox_{self._sub_device_index}"
-        )
+        wallbox: WallboxDataModel = self.coordinator.get_wallbox(self._sub_device_index)
+        if wallbox is None:
+            return None
+
         sun_mode = wallbox.sun_mode
 
         if sun_mode:
             return "Sonnenmodus"
         if sun_mode is None:
-            return None
+            return "Unknown"
         return "Mischmodus"
 
     async def async_select_option(self, option: str) -> None:

@@ -151,8 +151,4 @@ class RscpClient:
             # TODO make Exception more specific
             raise Exception("Error during data fetch: {err}") from err
 
-        result_values["storage"] = self.__storage.get_model()
-        for wallbox in self.__wallboxes:
-            result_values[f"wallbox_{wallbox.index}"] = wallbox.get_model()
-
         return result_values
