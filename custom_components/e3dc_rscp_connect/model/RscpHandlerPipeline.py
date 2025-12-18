@@ -16,6 +16,9 @@ class RscpHandlerPipeline:
 
     async def process(self, values):
         """Process a list of RSCP values."""
+        if values is None:
+            _LOGGER.warning("values is None, no data to process!")
+
         for value in values:
             handled = False
 
