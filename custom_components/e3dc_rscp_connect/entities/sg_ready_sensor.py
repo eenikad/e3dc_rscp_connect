@@ -17,7 +17,8 @@ class SGReadySensor(E3dcConnectEntity, SensorEntity):
         self.coordinator = coordinator
 
         self._attr_name = "SG Ready Status"
-        self._attr_unique_id = "sg_ready_state"
+        serial = coordinator.storage.serial.lower().replace("-", "_")
+        self._attr_unique_id = f"{serial}_sg_ready_state"
 
         self._attr_device_class = SensorDeviceClass.ENUM
         self._attr_translation_key = "sgready_status"

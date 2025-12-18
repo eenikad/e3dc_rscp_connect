@@ -24,9 +24,9 @@ class CpStateSensor(E3dcConnectEntity, SensorEntity):
         self.coordinator = coordinator
 
         self._attr_name = "Ladestatus"
-        self._attr_unique_id = (
-            f"{wallbox.device_name.lower().replace(' ', '_')}_charge_state"
-        )
+        serial = coordinator.storage.serial.lower().replace("-", "_")
+        wallbox_name = wallbox.device_name.lower().replace(" ", "_")
+        self._attr_unique_id = f"{serial}_{wallbox_name}_charge_state"
 
         self._attr_device_class = SensorDeviceClass.ENUM
         self._attr_translation_key = "wallbox_status"

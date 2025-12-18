@@ -119,8 +119,12 @@ class WallboxRscpModel(RscpModelInterface):
         self.__model.reset_state_data()
 
         value = container.get_child("TAG_WB_CP_STATE")
-        logger.debug("CP State: %s", value.toString())
-        self.__model.cp_state = value.getValue() if value is not None else None
+        if value is None:
+            logger.warning("CP State value is None for wb_index: %d", wb_index)
+            self.__model.cp_state = None
+        else:
+            logger.debug("CP State: %s", value.toString())
+            self.__model.cp_state = str(value.getValue())
 
         assigned_power_container = container.get_child("TAG_WB_ASSIGNED_POWER")
         if assigned_power_container:
@@ -137,3 +141,12 @@ class WallboxRscpModel(RscpModelInterface):
         self.__model.sun_mode = value.getValue() if value is not None else None
 
         return True
+
+    async def get_sun_mode_request(self, value: bool, send_and_receive):
+        """Sends a sun mode set request to the storage."""
+
+        request = RscpValue.construct_rscp_value(
+            "TAG_WB_REQ_DATA",
+            [("TAG_WB_INDEX", self.__index), ("TAG_WB_REQ_SET_SUN_MODE_ACTIVE", value)],
+        )
+        await send_and_receive(request)

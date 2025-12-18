@@ -8,6 +8,7 @@ from .e3dc.RscpFrame import RscpFrame
 from .e3dc.RscpValue import RscpValue
 from .model.StorageRscpModel import StorageRscpModel
 from .model.WallboxRscpModel import WallboxRscpModel
+from .model.WallboxDataModel import WallboxDataModel
 from .model.SgReadyRscpModel import SgReadyRscpModel
 
 from .model.RscpHandlerPipeline import RscpHandlerPipeline
@@ -34,6 +35,20 @@ class RscpClient:
     def wallboxes(self):
         "Get access to the stored wallbox data."
         return [wallbox.get_model() for wallbox in self.__wallboxes]
+
+    def get_wallbox(self, index: int) -> WallboxDataModel:
+        "Returns the ident data of a give wallbox."
+        for wallbox in self.wallboxes:
+            if wallbox.index == index:
+                return wallbox
+        return None
+
+    def _get_wallbox(self, index: int) -> WallboxRscpModel:
+        "Returns the ident data of a give wallbox."
+        for wallbox in self.__wallboxes:
+            if wallbox.get_model().index == index:
+                return wallbox
+        return None
 
     @property
     def storage(self):
@@ -119,12 +134,9 @@ class RscpClient:
     async def send_set_sun_mode_request(self, index: int, value: bool):
         """Sends a sun mode set request to the storage."""
 
-        request = RscpValue.construct_rscp_value(
-            "TAG_WB_REQ_DATA",
-            [("TAG_WB_INDEX", index), ("TAG_WB_REQ_SET_SUN_MODE_ACTIVE", value)],
-        )
-        response = await self.send_and_receive(request)
-        _LOGGER.debug(f"{response}")
+        wallbox = self._get_wallbox(index)
+        if wallbox is not None:
+            await wallbox.get_sun_mode_request(value, self.send_and_receive)
 
     def __get_value_for_path(self, path, rscp_value: RscpValue):
         "Returns the value for the given path, or None if path not found."

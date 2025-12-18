@@ -17,7 +17,8 @@ class EmergencyPowerSensor(E3dcConnectEntity, SensorEntity):
         self._entry = entry
         self.coordinator = coordinator
         self._attr_name = "Emergency Power Status"
-        self._attr_unique_id = "e3dc_rscp_connect_emergency_power_state"
+        serial = coordinator.storage.serial.lower().replace("-", "_")
+        self._attr_unique_id = f"{serial}_emergency_power_state"
 
         self._attr_device_class = SensorDeviceClass.ENUM
         self._attr_translation_key = "ep_status"
@@ -37,6 +38,8 @@ class EmergencyPowerSensor(E3dcConnectEntity, SensorEntity):
             return None
 
         ep_state = storage.emergency_power_state
+        if ep_state is None:
+            return None
 
         states = {
             0: "not_possible",

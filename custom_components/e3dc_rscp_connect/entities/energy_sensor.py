@@ -37,9 +37,11 @@ class EnergySensor(E3dcConnectEntity, SensorEntity, RestoreEntity):
         self._data_getter = data_getter
 
         self._attr_name = name
-        self._attr_unique_id = (
-            f"e3dc_rscp_connect_energy_{name.lower().replace(' ', '_')}"
-        )
+
+        serial = coordinator.storage.serial.lower().replace("-", "_")
+        name = name.lower().replace(" ", "_")
+        self._attr_unique_id = f"{serial}_{name}_energy"
+
         self._attr_native_unit_of_measurement = UnitOfEnergy.KILO_WATT_HOUR
         self._attr_device_class = SensorDeviceClass.ENERGY
         self._attr_state_class = SensorStateClass.TOTAL_INCREASING

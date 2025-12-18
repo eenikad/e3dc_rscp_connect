@@ -4,7 +4,7 @@ import logging
 
 from ..e3dc.RscpValue import RscpValue  # noqa: TID252
 from .RscpModelInterface import RscpModelInterface
-from .StorageDataModel import PvInverterData, StorageDataModel
+from .StorageDataModel import PvInverterData, StorageDataModel, DeviceState
 
 logger = logging.getLogger(__name__)
 
@@ -115,6 +115,7 @@ class StorageRscpModel(RscpModelInterface):
         else:
             for x in self.__model.inverters:
                 tags.extend(self.__create_rscp_tags_for_inverter(x))
+        tags.extend(self.__get_rscp_tags_for_battery())
         return tags
 
     def get_rscp_tags_slow(self) -> list[RscpValue]:
@@ -124,6 +125,7 @@ class StorageRscpModel(RscpModelInterface):
         represents slow changing data! The client will use this function only from time
         to time.
         """
+        return []
 
     def handle_rscp_data(self, container: RscpValue) -> bool:
         """This function is used to retrieve data from a rscp tag!
@@ -136,6 +138,8 @@ class StorageRscpModel(RscpModelInterface):
             return self.__handle_rcsp_tags_for_ems(container)
         if container.getTagName() == "TAG_PVI_DATA":
             return self.__hanlde_rscp_tags_for_pvi(container)
+        if container.getTagName() == "TAG_BAT_DATA":
+            return self.__handle_rscp_tags_for_battery(container)
         return False
 
     def __create_rscp_tags_for_ems(self):
@@ -248,3 +252,69 @@ class StorageRscpModel(RscpModelInterface):
                 )
 
         return True
+
+    def __get_rscp_tags_for_battery(self) -> list[RscpValue]:
+        value = RscpValue.construct_rscp_value(
+            "TAG_BAT_REQ_DATA",
+            [
+                ("TAG_BAT_INDEX", 0),
+                ("TAG_BAT_REQ_DEVICE_STATE", None),
+            ],
+        )
+        return [
+            value,
+            RscpValue.construct_rscp_value(
+                "TAG_BAT_REQ_DATA",
+                [
+                    ("TAG_BAT_INDEX", 1),
+                    ("TAG_BAT_REQ_DEVICE_STATE", None),
+                ],
+            ),
+        ]
+
+    def __handle_rscp_tags_for_battery(self, container: RscpValue) -> bool:
+        """hanlde all the rscp tags for the battery."""
+
+        if container.getTagName() == "TAG_BAT_DATA":
+            index = container.get_child("TAG_BAT_INDEX")
+
+            if index is None:
+                return False
+
+            index = index.getValue()
+            if not isinstance(index, int):
+                logger.warning("no index found in TAG_BAT_DATA, can't handle data")
+                return False
+
+            states = container.get_child("TAG_BAT_DEVICE_STATE")
+            if states is None:
+                logger.warning(
+                    "no TAG_BAT_DEVICE_STATE found for bat %d",
+                    index,
+                )
+                return False
+            connected = states.get_child("TAG_BAT_DEVICE_CONNECTED")
+            working = states.get_child("TAG_BAT_DEVICE_WORKING")
+
+            if connected is None or working is None:
+                logger.warning(
+                    "CONNECTED or WORKING was not received in BAT_DEVICE_STATE for bat %d",
+                    index,
+                )
+                return False
+
+            bat_state = self.__model.device_states.battery.get(index)
+            if bat_state is None:
+                bat_state = DeviceState()
+                self.__model.device_states.battery[index] = bat_state
+
+            connected = connected.getValue()
+
+            bat_state.connected = bool(connected)
+
+            working = working.getValue()
+            bat_state.working = bool(working)
+
+            return True
+
+        return False

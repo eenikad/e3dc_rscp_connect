@@ -7,10 +7,9 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 
 from .client import RscpClient
-from .model.WallboxDataModel import WallboxDataModel
-from .model.StorageDataModel import StorageDataModel
 from .model.SgReadyDataModel import SgReadyDataModel
-
+from .model.StorageDataModel import StorageDataModel
+from .model.WallboxDataModel import WallboxDataModel
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -84,10 +83,7 @@ class E3dcRscpCoordinator(DataUpdateCoordinator):
 
     def get_wallbox(self, index: int) -> WallboxDataModel:
         "Returns the ident data of a give wallbox."
-        for wallbox in self.client.wallboxes:
-            if wallbox.index == index:
-                return wallbox
-        return None
+        return self.client.get_wallbox(index)
 
     async def _async_update_data(self):
         try:

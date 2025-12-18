@@ -16,7 +16,9 @@ class StateOfChargeSensor(E3dcConnectEntity, SensorEntity):
         super().__init__(coordinator, entry)
 
         self._attr_name = "Ladezustand"
-        self._attr_unique_id = "e3dc_rscp_connect_ladezustand"
+        serial = coordinator.storage.serial.lower().replace("-", "_")
+        self._attr_unique_id = f"{serial}_soc"
+
         self._attr_native_unit_of_measurement = PERCENTAGE
         self._attr_device_class = SensorDeviceClass.BATTERY
 

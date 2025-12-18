@@ -8,6 +8,8 @@ from . import const
 from .coordinator import E3dcRscpCoordinator
 from .entities import (
     CpStateSensor,
+    DeviceStateSensor,
+    DeviceUpdateStateSensor,
     EmergencyPowerSensor,
     EnergySensor,
     PowerSensor,
@@ -165,6 +167,34 @@ async def async_setup_entry(
             # sensor_value_id="pvi_0_mppt_2_power",
         ),
         EmergencyPowerSensor(coordinator, config_entry),
+        DeviceStateSensor(
+            coordinator,
+            config_entry,
+            "Battery",
+            lambda: coordinator.storage.device_states.battery[0],
+            0,
+        ),
+        DeviceUpdateStateSensor(
+            coordinator,
+            config_entry,
+            "Battery",
+            lambda: coordinator.storage.device_states.battery[0],
+            0,
+        ),
+        # DeviceStateSensor(
+        #     coordinator,
+        #     config_entry,
+        #     "Battery",
+        #     lambda: coordinator.storage.device_states.battery[1],
+        #     1,
+        # ),
+        # DeviceUpdateStateSensor(
+        #     coordinator,
+        #     config_entry,
+        #     "Battery",
+        #     lambda: coordinator.storage.device_states.battery[1],
+        #     1,
+        # ),
         StateOfChargeSensor(coordinator, config_entry),
         SGReadySensor(coordinator, config_entry),
         *[

@@ -31,8 +31,9 @@ class PowerSensor(E3dcConnectEntity, SensorEntity):
             raise ValueError("data_getter or _sensor_value_id must be set!")
 
         self._attr_name = name
-        sensor_id = self._attr_name.lower().replace(" ", "_")
-        self._attr_unique_id = f"e3dc_rscp_connect_power_{sensor_id}"
+        name = name.lower().replace(" ", "_")
+        serial = coordinator.storage.serial.lower().replace("-", "_")
+        self._attr_unique_id = f"{serial}_{name}_power"
         self._attr_native_unit_of_measurement = UnitOfPower.WATT
         self._attr_device_class = SensorDeviceClass.POWER
         self._attr_state_class = SensorStateClass.MEASUREMENT
