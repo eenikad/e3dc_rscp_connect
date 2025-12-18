@@ -6,6 +6,7 @@ from homeassistant.core import HomeAssistant
 
 from . import const
 from .coordinator import E3dcRscpCoordinator
+from .model.StorageDataModel import DeviceState
 from .entities import (
     CpStateSensor,
     DeviceStateSensor,
@@ -171,14 +172,14 @@ async def async_setup_entry(
             coordinator,
             config_entry,
             "Battery",
-            lambda: coordinator.storage.device_states.battery[0],
+            lambda: coordinator.storage.device_states.battery.get(0, DeviceState()),
             0,
         ),
         DeviceUpdateStateSensor(
             coordinator,
             config_entry,
             "Battery",
-            lambda: coordinator.storage.device_states.battery[0],
+            lambda: coordinator.storage.device_states.battery.get(0, DeviceState()),
             0,
         ),
         # DeviceStateSensor(
