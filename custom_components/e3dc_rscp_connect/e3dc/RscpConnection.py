@@ -103,10 +103,18 @@ class RscpConnection:
             raise RscpConnectionException(str(e))
 
     async def receive(self, timeout=1000):
-        buffer = await self._receive(timeout)
+        _buffer = await self._receive(timeout)
+
+        buffer = _buffer
 
         if self.__ciphersuite:
-            buffer = self.__ciphersuite.decrypt(buffer)
+            buffer = self.__ciphersuite.decrypt(_buffer)
+            if buffer is None:
+                log.warning(
+                    "[%s] Decryption failed: len(buffer) == %d",
+                    self.__host,
+                    len(_buffer),
+                )
 
         return buffer
 

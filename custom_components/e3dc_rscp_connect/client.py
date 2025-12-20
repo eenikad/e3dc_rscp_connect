@@ -123,6 +123,11 @@ class RscpClient:
         """
         await self.client.send(RscpFrame().packFrame(rscpValuesToSend))
         recv_buffer = await self.client.receive()
+
+        if recv_buffer is None:
+            _LOGGER.warn("recv buffer is None, decryption failure???")
+            return []
+
         recvd_frame_length = RscpFrame.getFrameLength(recv_buffer)
 
         frame = RscpFrame()
@@ -156,6 +161,12 @@ class RscpClient:
             requests = await self.__handlerPipeline.collect_tags()
             # transfer data and wait for response
             received_values = await self.send_and_receive(requests)
+            if received_values is None:
+                _LOGGER.warning(
+                    "Received no values from device: %s for tags:",
+                    self.__storage.serial,
+                    requests.toString(),
+                )
 
             await self.__handlerPipeline.process(received_values)
 
