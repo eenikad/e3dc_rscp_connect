@@ -53,6 +53,8 @@ class RscpClient:
     @property
     def storage(self):
         "Get access to storage data."
+        if self.__storage is None:
+            return None
         return self.__storage.get_model()
 
     @property
@@ -70,6 +72,24 @@ class RscpClient:
                 raise ConnectionError(
                     "Couldn't authorize! Check username and password!"
                 )
+
+    def __add_identified_storage(self, storage):
+        def set_storage(self, storage):
+            self.__storage = storage
+            self.__handlerPipeline.add_handler(storage)
+
+        if storage is None:
+            _LOGGER.warning("Can't set storage to None!")
+            return
+
+        if self.__storage is None:
+            set_storage(self, storage)
+            return
+
+        if storage.ident_serial == self.__storage.ident_serial:
+            _LOGGER.info("Re-Identified storage: %s!", storage.ident_serial)
+        else:
+            set_storage(self, storage)
 
     async def identify_device(self) -> dict:
         "Reads serial number and firmware version from device."
@@ -92,9 +112,9 @@ class RscpClient:
             #
             for value in received_values:
                 storage = StorageRscpModel.identify(value)
+
                 if storage is not None:
-                    self.__storage = storage
-                    self.__handlerPipeline.add_handler(storage)
+                    self.__add_identified_storage(storage)
 
                 wallbox = WallboxRscpModel.identify(value)
                 if wallbox is not None:
@@ -163,9 +183,9 @@ class RscpClient:
             received_values = await self.send_and_receive(requests)
             if received_values is None:
                 _LOGGER.warning(
-                    "Received no values from device: %s for tags:",
-                    self.__storage.serial,
-                    requests.toString(),
+                    "Received no values from device: %s for tags: %s",
+                    getattr(self.__storage, "serial", None),
+                    requests,
                 )
 
             await self.__handlerPipeline.process(received_values)
